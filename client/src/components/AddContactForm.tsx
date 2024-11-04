@@ -19,7 +19,7 @@ const AddContactForm: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-white shadow rounded mb-4">
+    <div className="p-6 bg-white  rounded mb-4">
       <h2 className="text-2xl font-semibold mb-4">Add New Contact</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
