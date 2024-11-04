@@ -5,16 +5,19 @@ const AddContactForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [variant, setVariant] = useState<"success" | "error" | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await addContact({ email, phone });
       setMessage("Contact added successfully");
+      setVariant("success");
       setEmail("");
       setPhone("");
     } catch (error) {
       setMessage("Failed to add contact");
+      setVariant("error");
     }
   };
 
@@ -44,7 +47,15 @@ const AddContactForm: React.FC = () => {
           Add Contact
         </button>
       </form>
-      {message && <p className="mt-2 text-sm text-green-600">{message}</p>}
+      {message && (
+        <p
+          className={`mt-2 text-sm ${
+            variant === "success" ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {message}
+        </p>
+      )}
     </div>
   );
 };
