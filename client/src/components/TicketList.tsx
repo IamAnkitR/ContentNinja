@@ -20,16 +20,37 @@ const TicketList: React.FC = () => {
   return (
     <div className="p-6 bg-white shadow rounded mb-4">
       <h2 className="text-2xl font-semibold mb-4">Tickets</h2>
-      <ul>
-        {tickets.map((ticket) => (
-          <li key={ticket.id} className="border-b py-2">
-            <p className="font-medium">
-              Pipeline: {ticket.properties.hs_pipeline || "N/A"}
-            </p>
-            <p>Stage: {ticket.properties.hs_pipeline_stage || "N/A"}</p>
-          </li>
-        ))}
-      </ul>
+
+      <table className="w-full border-collapse text-left">
+        <thead>
+          <tr className="border-b">
+            <th className="p-2 font-semibold">Pipeline</th>
+            <th className="p-2 font-semibold">Stage</th>
+            <th className="p-2 font-semibold">Created Date</th>
+            <th className="p-2 font-semibold">Last Modified Date</th>
+            <th className="p-2 font-semibold">Archived</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tickets.map((ticket) => (
+            <tr key={ticket.id} className="border-b">
+              <td className="p-2">{ticket.properties.hs_pipeline || "N/A"}</td>
+              <td className="p-2">
+                {ticket.properties.hs_pipeline_stage || "N/A"}
+              </td>
+              <td className="p-2">
+                {new Date(ticket.createdAt).toUTCString() || "N/A"}
+              </td>
+              <td className="p-2">
+                {new Date(
+                  ticket.properties.hs_lastmodifieddate
+                ).toUTCString() || "N/A"}
+              </td>
+              <td className="p-2">{ticket.archived ? "Yes" : "No"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

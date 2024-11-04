@@ -19,5 +19,8 @@ export interface ITicket {
   properties: {
     hs_pipeline: string;
     hs_pipeline_stage: string;
+    hs_lastmodifieddate: string;
   };
+  createdAt: string;
+  archived: boolean;
 }
