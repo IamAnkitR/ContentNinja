@@ -5,33 +5,33 @@ import logger from "../utils/logger";
 
 export const fetchContactDetails = async (req: Request, res: Response) => {
   const limit = 100;
-  const maxRecords = 500;
-  let results: any[] = [];
-  let after: string | null = null;
+  const page = parseInt(req.query.page as string) || 1;
+  let after = parseInt(req.query.after as string) || null;
 
   try {
-    while (results.length < maxRecords) {
-      const response: any = await axios.get(
-        `${HUBSPOT_API_URL}/crm/v3/objects/contacts`,
-        {
-          headers: {
-            Authorization: `Bearer ${HUBSPOT_ACCESS_TOKEN}`,
-          },
-          params: {
-            properties: "email,phone",
-            limit,
-            after,
-          },
-        }
-      );
+    const response: any = await axios.get(
+      `${HUBSPOT_API_URL}/crm/v3/objects/contacts`,
+      {
+        headers: {
+          Authorization: `Bearer ${HUBSPOT_ACCESS_TOKEN}`,
+        },
+        params: {
+          properties: "email,phone",
+          limit,
+          after,
+        },
+      }
+    );
 
-      results = [...results, ...response.data.results];
-      after = response.data.paging?.next?.after || null;
+    const contacts = response.data.results;
+    after = response.data.paging?.next?.after || null;
 
-      if (!after) break;
-    }
-
-    res.json({ results: results.slice(0, maxRecords) });
+    res.json({
+      contacts,
+      nextPageAfter: after,
+      page,
+      limit,
+    });
   } catch (error: any) {
     console.error(`Error while fetching contact details: ${error.stack}`);
     res.status(500).json({ error: "Failed to fetch contacts" });

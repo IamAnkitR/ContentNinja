@@ -5,36 +5,38 @@ import { IContact } from "../interface";
 const ContactList: React.FC = () => {
   const [contacts, setContacts] = useState<IContact[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [after, setAfter] = useState(null);
+  const [isLastPage, setIsLastPage] = useState(false);
+  const [count, setCount] = useState(0);
   const contactsPerPage = 100;
 
   useEffect(() => {
     const getContacts = async () => {
       try {
-        const response = await fetchContacts();
-        setContacts(response.data.results);
+        const response = await fetchContacts(currentPage, after);
+        setIsLastPage(!response.data.nextPageAfter);
+
+        setContacts(response.data.contacts);
+        setAfter(response.data.nextPageAfter);
       } catch (error) {
         console.error("Error fetching contacts:", error);
       }
     };
     getContacts();
-  }, []);
-
-  const indexOfLastContact = currentPage * contactsPerPage;
-  const indexOfFirstContact = indexOfLastContact - contactsPerPage;
-  const currentContacts = contacts?.slice(
-    indexOfFirstContact,
-    indexOfLastContact
-  );
+  }, [currentPage]);
 
   const nextPage = () => {
-    if (currentPage < Math.ceil(contacts.length / contactsPerPage)) {
+    if (!isLastPage) {
       setCurrentPage((prev) => prev + 1);
+      setCount((prev) => prev + 1);
     }
   };
 
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
+      setCount((prev) => prev - 1);
+      setAfter(null);
     }
   };
 
@@ -53,16 +55,11 @@ const ContactList: React.FC = () => {
           >
             Previous
           </button>
-
           <button
             onClick={nextPage}
-            disabled={
-              currentPage === Math.ceil(contacts.length / contactsPerPage)
-            }
+            disabled={count > 3}
             className={`px-4 py-2 bg-blue-500 text-white rounded ${
-              currentPage === Math.ceil(contacts.length / contactsPerPage)
-                ? "opacity-50 cursor-not-allowed"
-                : ""
+              count > 3 ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             Next
@@ -79,9 +76,11 @@ const ContactList: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {currentContacts.map((contact, index) => (
+          {contacts.map((contact, index) => (
             <tr key={contact.id} className="border-b">
-              <td className="p-2">{indexOfFirstContact + index + 1}</td>
+              <td className="p-2">
+                {(currentPage - 1) * contactsPerPage + index + 1}
+              </td>
               <td className="p-2">{contact.properties.email || "N/A"}</td>
               <td className="p-2">{contact.properties.phone || "N/A"}</td>
             </tr>
